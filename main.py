@@ -23,7 +23,8 @@ class PingHandler(BaseHTTPRequestHandler):
 
 
 def run_server():
-    port = int(os.getenv("PORT", "8080"))
+    port = int(os.getenv("PORT", "10000"))
+    print(f"🌐 Мини-сервер запущен на порту {port}")
     server = HTTPServer(("0.0.0.0", port), PingHandler)
     server.serve_forever()
 
@@ -67,11 +68,11 @@ class VerifyView(discord.ui.View):
         try:
             await member.add_roles(role, reason="Verification")
             await interaction.response.send_message(
-                f"Готово! Тебе выдана роль **{role.name}**.", ephemeral=True
+                f"🎉 Готово! Тебе выдана роль **{role.name}**.", ephemeral=True
             )
         except discord.Forbidden:
             await interaction.response.send_message(
-                "У бота нет прав выдать эту роль. Проверь, что роль бота стоит ВЫШЕ роли member.",
+                "❌ У бота нет прав выдать эту роль. Проверь, что роль бота стоит ВЫШЕ роли member.",
                 ephemeral=True,
             )
 
@@ -83,7 +84,7 @@ async def on_ready():
         synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
         print(f"Синхронизировано команд: {len(synced)}")
     except Exception as e:
-        print(f"Ошибка синхронизации: {e}")
+        print(f"Ошибка синхронизации команд: {e}")
     print(f"Бот запущен как {bot.user}")
 
 
@@ -115,7 +116,7 @@ async def setup_verify(interaction: discord.Interaction):
 
 
 if __name__ == "__main__":
-    # запускаем сервер в отдельном потоке
+    # запускаем мини-сервер в отдельном потоке
     threading.Thread(target=run_server, daemon=True).start()
     # запускаем бота
     bot.run(TOKEN)
