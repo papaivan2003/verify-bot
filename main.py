@@ -44,7 +44,7 @@ class VerifyView(discord.ui.View):
     @discord.ui.button(
         label="Verify",
         style=discord.ButtonStyle.success,
-        emoji=" ",
+        emoji="🔐",
         custom_id="verify_button",
     )
     async def verify(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -54,7 +54,7 @@ class VerifyView(discord.ui.View):
 
         if role is None:
             await interaction.response.send_message(
-                "Роль для верификации не найдена. Сообщи администратору.",
+                "❌ Роль для верификации не найдена. Сообщи администратору.",
                 ephemeral=True,
             )
             return
@@ -68,7 +68,7 @@ class VerifyView(discord.ui.View):
         try:
             await member.add_roles(role, reason="Verification")
             await interaction.response.send_message(
-                f"Готово! Тебе выдана роль **{role.name}**.", ephemeral=True
+                f"Тебе выдана роль **{role.name}**.", ephemeral=True
             )
         except discord.Forbidden:
             await interaction.response.send_message(
@@ -95,9 +95,12 @@ async def on_ready():
 )
 @app_commands.checks.has_permissions(administrator=True)
 async def setup_verify(interaction: discord.Interaction):
+    # Сразу говорим Discord, что бот принял команду и обрабатывает её
+    await interaction.response.defer(ephemeral=True)
+
     channel = bot.get_channel(VERIFY_CHANNEL_ID)
     if channel is None:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "Канал не найден. Проверь VERIFY_CHANNEL_ID.", ephemeral=True
         )
         return
@@ -105,19 +108,18 @@ async def setup_verify(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Верификация",
         description="Нажми кнопку ниже, чтобы получить доступ к серверу.",
-        color=discord.Color.green(),
+        color=discord.Color.gray(),
     )
     embed.set_image(url="https://i.imgur.com/8NYS33t.jpeg")
     embed.set_footer(text="Verification System")
 
     await channel.send(embed=embed, view=VerifyView())
-    await interaction.response.send_message(
+
+    await interaction.followup.send(
         f"Сообщение отправлено в {channel.mention}", ephemeral=True
     )
 
 
 if __name__ == "__main__":
-    # запускаем мини-сервер в отдельном потоке
     threading.Thread(target=run_server, daemon=True).start()
-    # запускаем бота
     bot.run(TOKEN)
