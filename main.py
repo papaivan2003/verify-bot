@@ -24,7 +24,7 @@ class PingHandler(BaseHTTPRequestHandler):
 
 def run_server():
     port = int(os.getenv("PORT", "10000"))
-    print(f"🌐 Мини-сервер запущен на порту {port}")
+    print(f"Мини-сервер запущен на порту {port}")
     server = HTTPServer(("0.0.0.0", port), PingHandler)
     server.serve_forever()
 
@@ -44,7 +44,7 @@ class VerifyView(discord.ui.View):
     @discord.ui.button(
         label="Verify",
         style=discord.ButtonStyle.success,
-        emoji="🔐",
+        emoji=" ",
         custom_id="verify_button",
     )
     async def verify(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -68,11 +68,11 @@ class VerifyView(discord.ui.View):
         try:
             await member.add_roles(role, reason="Verification")
             await interaction.response.send_message(
-                f"🎉 Готово! Тебе выдана роль **{role.name}**.", ephemeral=True
+                f"Готово! Тебе выдана роль **{role.name}**.", ephemeral=True
             )
         except discord.Forbidden:
             await interaction.response.send_message(
-                "❌ У бота нет прав выдать эту роль. Проверь, что роль бота стоит ВЫШЕ роли member.",
+                "У бота нет прав выдать эту роль. Проверь, что роль бота стоит ВЫШЕ роли member.",
                 ephemeral=True,
             )
 
@@ -107,6 +107,7 @@ async def setup_verify(interaction: discord.Interaction):
         description="Нажми кнопку ниже, чтобы получить доступ к серверу.",
         color=discord.Color.green(),
     )
+    embed.set_image(url="https://i.imgur.com/8NYS33t.jpeg")
     embed.set_footer(text="Verification System")
 
     await channel.send(embed=embed, view=VerifyView())
